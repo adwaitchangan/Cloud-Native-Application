@@ -1,0 +1,34 @@
+name: 'Packer'
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  packer_validate:
+    name: 'Packer'
+    runs-on: ubuntu-latest
+
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Setup packer
+      uses: hashicorp/setup-packer@main
+      id: setup
+      with:
+        version: "1.10.1"
+
+    - name: Zip webapp 
+      run: zip -r webapp.zip ./
+
+    - name: Packer init
+      run: packer init .
+
+    - name: Packer Format
+      run: packer fmt -check .
+
+    - name: Packer Validate
+      run: packer validate gcp.pkr.hcl
